@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        NETSENTRY - Network Dashboard
+    </title>
+
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>
+                NETSENTRY
+            </h1>
+
+            <p>
+                Network Monitoring & Device Health Dashboard
+            </p>
+
+        </div>
+
+
+        <button
+            id="checkAllBtn"
+            class="btn btn-primary"
+            onclick="checkAllDevices()"
+        >
+
+            ↻ Check All Devices
+
+        </button>
+
+    </header>
+
+
+
+    <!-- ==========================================
+         STATISTICS
+    =========================================== -->
+
+    <section class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                🖥️ Total Devices
+            </div>
+
+            <div
+                id="totalDevices"
+                class="stat-number"
+            >
+                0
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                🟢 Online
+            </div>
+
+            <div
+                id="onlineDevices"
+                class="stat-number online"
+            >
+                0
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                🔴 Offline
+            </div>
+
+            <div
+                id="offlineDevices"
+                class="stat-number offline"
+            >
+                0
+            </div>
+
+        </div>
+
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                ⚠️ Active Alerts
+            </div>
+
+            <div
+                id="activeAlerts"
+                class="stat-number alert"
+            >
+                0
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================
+         DEVICES PANEL
+    =========================================== -->
+
+    <section class="panel">
+
+
+        <div class="panel-header">
+
+
+            <div>
+
+                <h2>
+                    Network Devices
+                </h2>
+
+                <p>
+                    Registered devices and current health status
+                </p>
+
+            </div>
+
+
+            <div class="panel-actions">
+
+
+                <button
+                    class="btn btn-success"
+                    onclick="addDevice()"
+                >
+
+                    + Add Device
+
+                </button>
+
+
+                <button
+                    class="btn btn-light"
+                    onclick="loadDevices()"
+                >
+
+                    ↻ Refresh
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search device by hostname or IP address..."
+                oninput="filterDevices()"
+            >
+
+        </div>
+
+
+
+        <!-- TABLE -->
+
+        <div class="table-container">
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>HOSTNAME</th>
+
+                        <th>IP ADDRESS</th>
+
+                        <th>TYPE</th>
+
+                        <th>STATUS</th>
+
+                        <th>RESPONSE</th>
+
+                        <th>LAST CHECKED</th>
+
+                        <th>ACTIONS</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="deviceTableBody">
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================
+         NETWORK HEALTH
+    =========================================== -->
+
+    <section class="panel">
+
+
+        <h2>
+            📊 Network Health
+        </h2>
+
+
+        <p class="subtitle">
+            Current network device distribution
+        </p>
+
+
+
+        <div class="health">
+
+
+            <div>
+
+                <span
+                    class="dot online-dot"
+                ></span>
+
+                Online
+
+                <strong
+                    id="healthOnline"
+                >
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <div>
+
+                <span
+                    class="dot offline-dot"
+                ></span>
+
+                Offline
+
+                <strong
+                    id="healthOffline"
+                >
+                    0
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================
+         MONITORING HISTORY
+    =========================================== -->
+
+    <section class="panel history-panel">
+
+
+        <div class="panel-header">
+
+
+            <div>
+
+                <h2>
+                    🕒 Device Monitoring History
+                </h2>
+
+                <p>
+                    Showing recent network checks
+                </p>
+
+            </div>
+
+
+            <button
+                class="btn btn-light"
+                onclick="loadHistory()"
+            >
+
+                ↻ Refresh History
+
+            </button>
+
+
+        </div>
+
+
+
+        <div class="table-container">
+
+
+            <table>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>DEVICE</th>
+
+                        <th>IP ADDRESS</th>
+
+                        <th>STATUS</th>
+
+                        <th>RESPONSE</th>
+
+                        <th>CHECKED AT</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="historyTableBody"
+                >
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+
+                            No monitoring history yet.
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+
+<!-- ==========================================
+     JAVASCRIPT
+=========================================== -->
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/dashboard.js'
+    ) }}"
+></script>
+
+
+</body>
+
+</html>
